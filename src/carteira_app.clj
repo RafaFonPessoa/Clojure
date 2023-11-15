@@ -2,9 +2,9 @@
   (:require [api :as api]
             [ui :as ui]))
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;; RODANDO A APLICAÇÃO ;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; RODANDO A APLICAÇÃO ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn menu-principal []
   (loop []
@@ -34,19 +34,30 @@
                         (api/exibir-dados-acao (read-line))
                         (recur))
         (= selecao 3) (do
-                        (println "Opção não implementada ainda. Tente novamente.")
-                        (recur))
+                        (println "Digite o código da ação:")
+                        (let [codigo (read-line)
+                              quantidade (Integer. (read-line))
+                              valor (Float. (read-line))]
+                          (api/registrar-compra codigo quantidade valor)
+                          (recur)))
         (= selecao 4) (do
-                        (println "Opção não implementada ainda. Tente novamente.")
-                        (recur))
+                        (println "Digite o código da ação:")
+                        (let [codigo (read-line)
+                              quantidade (Integer. (read-line))
+                              valor (Float. (read-line))]
+                          (api/registrar-venda codigo quantidade valor)
+                          (recur)))
+
         (= selecao 5) (do
-                        (println "Opção não implementada ainda. Tente novamente.")
+                        (api/exibir-extrato-completo)
                         (recur))
         (= selecao 6) (do
-                        (println "Opção não implementada ainda. Tente novamente.")
-                        (recur))
+                        (println "Digite o tipo (compra/venda):")
+                        (let [tipo (read-line)]
+                          (api/exibir-transacoes-tipo tipo)
+                          (recur)))
         (= selecao 7) (do
-                        (println "Opção não implementada ainda. Tente novamente.")
+                        (api/exibir-saldo-total)
                         (recur))
         (= selecao 8) (do
                         (println "Saindo...")

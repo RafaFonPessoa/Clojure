@@ -1,13 +1,14 @@
 (ns api
   (:require [clj-http.client :as http-client]
-  [cheshire.core :as json])
-  )
+            [cheshire.core :as json]))
+
 (def api-url "https://brapi.dev/api/quote/")
 (def chave "h6PQv7nGo28jwg7UiePTEU")
 
 ;; Átomo para armazenar as transações
 (def transacoes (atom {:compra [] :venda []}))
 
+;;Obtem o Json da API
 (defn obter-cotacao [codigo]
   (let [url (str api-url codigo "?token=" chave)
         response (http-client/get url)]
@@ -17,6 +18,7 @@
         (println (str "Erro na requisição: " (:status response)))
         nil))))
 
+;; 1)
 (defn exibir-lista-companhias []
   (let [url (str api-url "list?token=" chave)
         response (http-client/get url)]
@@ -29,23 +31,11 @@
           (doseq [index indexes]
             (println (str (:stock index) " - " (:name index))))
           (doseq [stock stocks]
-            (println (str (:stock stock) " - " (:name stock)))))
-        )
+            (println (str (:stock stock) " - " (:name stock))))))
       (println (str "Erro na requisição: " (:status response))))))
 
-(defn registrar-transacao [tipo codigo quantidade valor]
-  (swap! transacoes update-in [tipo] conj {:codigo codigo :quantidade quantidade :valor valor :data (java.util.Date.)}))
-
-(defn exibir-transacoes-tipo [tipo]
-  (let [transacoes-tipo (get @transacoes tipo)]
-    (doseq [transacao transacoes-tipo]
-      (println (str "Tipo: " tipo ", Código: " (:codigo transacao) ", Quantidade: " (:quantidade transacao) ", Valor: " (:valor transacao) ", Data: " (:data transacao))))))
-
-(defn exibir-saldo-total []
-  (let [compra (get @transacoes :compra)
-        venda (get @transacoes :venda)]
-    (println (str "Saldo Total da Carteira: " (- (apply + (map :valor compra)) (apply + (map :valor venda)))))))
-
+;;2)
+;;2)
 (defn exibir-dados-acao [codigo]
   (let [cotacao (obter-cotacao codigo)]
     (if cotacao
@@ -65,18 +55,40 @@
             (println (str "Preço de Abertura: " (:regularMarketOpen (first results))))
             (println (str "Preço de Fechamento: " (:regularMarketPreviousClose (first results))))
             (println (str "Hora: " (:regularMarketTime (first results))))
+            (println "")))))))
 
-            ;; Solicitar dados para registrar uma transação
-            (println "Digite a quantidade de ações:")
-            (let [quantidade (Integer. (read-line))]
-              (println "Digite o valor da ação:")
-              (let [valor (Float. (read-line))]
-                (println "Digite o tipo da transação (compra/venda):")
-                (let [tipo (read-line)]
-                  (registrar-transacao tipo codigo quantidade valor)))))
+;;3)
+(defn registrar-compra [codigo quantidade valor]
+  (swap! transacoes update-in [:compra] conj {:codigo codigo :quantidade quantidade :valor valor :data (java.util.Date.)}))
 
-          (do
-            (println "Ação encontrada, mas sem resultados.")
-            (exibir-saldo-total)))
-        )
-      (println (str "Ação não encontrada: " codigo)))))
+;;4)
+(defn registrar-venda [codigo quantidade valor]
+  (swap! transacoes update-in [:venda] conj {:codigo codigo :quantidade quantidade :valor valor :data (java.util.Date.)}))
+
+;;6)
+(defn exibir-transacoes-tipo [tipo]
+  (let [transacoes-tipo (get @transacoes tipo)]
+    (doseq [transacao transacoes-tipo]
+      (println (str "Tipo: " tipo ", Código: " (:codigo transacao) ", Quantidade: " (:quantidade transacao) ", Valor: " (:valor transacao) ", Data: " (:data transacao))))))
+
+;;7)
+(defn exibir-saldo-total []
+  (let [compra (get @transacoes :compra)
+        venda (get @transacoes :venda)]
+    (println (str "Saldo Total da Carteira: " (- (apply + (map :valor compra)) (apply + (map :valor venda)))))))
+
+(defn exibir-transacoes []
+  (do
+    (println "Transações de Compra:")
+    (exibir-transacoes-tipo :compra)
+    (println "")
+    (println "Transações de Venda:")
+    (exibir-transacoes-tipo :venda)))
+
+;;5)
+(defn exibir-extrato-completo []
+  (do
+    (exibir-transacoes)))
+
+
+
