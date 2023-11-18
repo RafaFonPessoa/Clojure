@@ -34,17 +34,19 @@
                         (api/exibir-dados-acao (read-line))
                         (recur))
         (= selecao 3) (do
-                        (println "Digite o código da ação:")
+                        (println "Digite o código da ação e depois a quantidade:")
                         (let [codigo (read-line)
                               quantidade (Integer. (read-line))
-                              valor (Float. (read-line))]
+                              cotacao (api/obter-cotacao codigo)
+                              valor (if cotacao (:regularMarketPrice (first (:results cotacao))))]
                           (api/registrar-compra codigo quantidade valor)
                           (recur)))
         (= selecao 4) (do
-                        (println "Digite o código da ação:")
+                        (println "Digite o código da ação e depois a quantidade:")
                         (let [codigo (read-line)
                               quantidade (Integer. (read-line))
-                              valor (Float. (read-line))]
+                              cotacao (api/obter-cotacao codigo)
+                              valor (if cotacao (:regularMarketPrice (first (:results cotacao))))]
                           (api/registrar-venda codigo quantidade valor)
                           (recur)))
 
@@ -54,6 +56,7 @@
         (= selecao 6) (do
                         (println "Digite o tipo (compra/venda):")
                         (let [tipo (read-line)]
+                          (println (str "Exibindo transações do tipo: " tipo))
                           (api/exibir-transacoes-tipo tipo)
                           (recur)))
         (= selecao 7) (do
@@ -67,6 +70,7 @@
                 (recur))))))
 
 (menu-principal)
+
 
 
 
