@@ -67,13 +67,18 @@
 
 ;;6)
 (defn exibir-transacoes-tipo [tipo]
-  (let [transacoes-tipo (get @transacoes tipo)]
-    (if transacoes-tipo
-      (do
-        (println (str "Transações do tipo " tipo ":"))
-        (doseq [transacao transacoes-tipo]
-          (println (str "Código: " (:codigo transacao) ", Quantidade: " (:quantidade transacao) ", Valor: " (:valor transacao) ", Data: " (:data transacao)))))
-      (println (str "Nenhuma transação do tipo " tipo " encontrada.")))))
+  (let [transacoes-tipo (get @transacoes (keyword tipo))]
+    (do
+      (println tipo)
+      (println transacoes-tipo)
+      (if transacoes-tipo
+        (do
+          (println (str "Transações do tipo " tipo ":"))
+          (doseq [transacao transacoes-tipo]
+            (println (str "Código: " (:codigo transacao) ", Quantidade: " (:quantidade transacao) ", Valor: " (:valor transacao) ", Data: " (:data transacao)))))
+        (println (str "Nenhuma transação do tipo " tipo " encontrada.")))))
+    )
+
 
 ;;7)
 (defn exibir-saldo-total []
@@ -93,6 +98,5 @@
 (defn exibir-extrato-completo []
   (do
     (exibir-transacoes)))
-
 
 
