@@ -8,10 +8,7 @@
 
 (defn menu-principal []
   (loop []
-    (ui/banner)
     (println "----------------------------------------------------")
-    (ui/menu)
-    (println "")
     (println "Escreva o número para selecionar a opção desejada:")
     (println "1) Ver Lista Completa de Companhias cadastradas na B3")
     (println "2) Exibir dados da ação de uma companhia")
@@ -45,9 +42,8 @@
                         (println "Digite o código da ação e depois a quantidade:")
                         (let [codigo (read-line)
                               quantidade (Integer. (read-line))
-                              cotacao (api/obter-cotacao codigo)
-                              valor (if cotacao (:regularMarketPrice (first (:results cotacao))))]
-                          (api/registrar-venda codigo quantidade valor)
+                              ]
+                          (api/registrar-venda codigo quantidade)
                           (recur)))
 
         (= selecao 5) (do
@@ -69,6 +65,9 @@
                 (println "Opção inválida. Tente novamente.")
                 (recur))))))
 
+(ui/banner)
+(ui/menu)
+(println "")
 (menu-principal)
 
 

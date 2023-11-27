@@ -35,7 +35,6 @@
       (println (str "Erro na requisição: " (:status response))))))
 
 ;;2)
-;;2)
 (defn exibir-dados-acao [codigo]
   (let [cotacao (obter-cotacao codigo)]
     (if cotacao
@@ -59,21 +58,27 @@
 
 ;;3)
 (defn registrar-compra [codigo quantidade valor]
-  (swap! transacoes update-in [:compra] conj {:codigo codigo :quantidade quantidade :valor valor :data (java.util.Date.)}))
+  (swap! transacoes update-in [:compra] conj {:codigo codigo :quantidade quantidade :valor valor :data (java.util.Date.)})
+  (println "Compra concluída com sucesso."))
 
 ;;4)
-(defn registrar-venda [codigo quantidade valor]
-  (swap! transacoes update-in [:venda] conj {:codigo codigo :quantidade quantidade :valor valor :data (java.util.Date.)}))
+(defn registrar-venda [codigo quantidade]
+  (let [qntAtual (reduce + (map :quantidade (filter #(and (= codigo (:codigo %)) (= "compra" (:tipo %))) @transacoes)))
+        cotacao (obter-cotacao codigo)
+        valor (if cotacao (:regularMarketPrice (first (:results cotacao))))]
+
+    (cond (< quantidade qntAtual)
+          (println "Não foi possível fazer a venda. Quantidade insuficiente.")
+          :else (do
+                  (swap! transacoes update-in [:venda] conj {:codigo codigo :quantidade quantidade :valor valor :data (java.util.Date.)})
+                  (println "Venda registrada com sucesso.")))))
 
 ;;6)
 (defn exibir-transacoes-tipo [tipo]
   (let [transacoes-tipo (get @transacoes (keyword tipo))]
     (do
-      (println tipo)
-      (println transacoes-tipo)
       (if transacoes-tipo
         (do
-          (println (str "Transações do tipo " tipo ":"))
           (doseq [transacao transacoes-tipo]
             (println (str "Código: " (:codigo transacao) ", Quantidade: " (:quantidade transacao) ", Valor: " (:valor transacao) ", Data: " (:data transacao)))))
         (println (str "Nenhuma transação do tipo " tipo " encontrada.")))))
