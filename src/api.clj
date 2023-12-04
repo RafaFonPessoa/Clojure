@@ -58,7 +58,7 @@
 
 ;;3)
 (defn registrar-compra [codigo quantidade valor]
-  (swap! transacoes update-in [:compra] conj {:codigo codigo :quantidade quantidade :valor valor :data (java.util.Date.)})
+  (swap! transacoes update-in [:compra] conj {:codigo codigo :quantidade quantidade :valor (* valor quantidade)  :data (java.util.Date.)})
   (println "Compra concluída com sucesso."))
 
 ;;4)
@@ -67,10 +67,10 @@
         cotacao (obter-cotacao codigo)
         valor (if cotacao (:regularMarketPrice (first (:results cotacao))))]
 
-    (cond (< quantidade qntAtual)
+    (cond (> quantidade qntAtual)
           (println "Não foi possível fazer a venda. Quantidade insuficiente.")
           :else (do
-                  (swap! transacoes update-in [:venda] conj {:codigo codigo :quantidade quantidade :valor valor :data (java.util.Date.)})
+                  (swap! transacoes update-in [:venda] conj {:codigo codigo :quantidade quantidade :valor (* valor quantidade) :data (java.util.Date.)})
                   (println "Venda registrada com sucesso.")))))
 
 ;;6)
@@ -80,7 +80,7 @@
       (if transacoes-tipo
         (do
           (doseq [transacao transacoes-tipo]
-            (println (str "Código: " (:codigo transacao) ", Quantidade: " (:quantidade transacao) ", Valor: " (:valor transacao) ", Data: " (:data transacao)))))
+            (println (str "Código: " (:codigo transacao) ", Quantidade: " (:quantidade transacao) ", Valor: " (format "%.2f" (:valor transacao)) ", Data: " (:data transacao)))))
         (println (str "Nenhuma transação do tipo " tipo " encontrada.")))))
     )
 
